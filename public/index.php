@@ -7,11 +7,19 @@ require '../vendors/lib/functions.php';
 
 $query = $_SERVER['REQUEST_URI'];
 $router = new Router();
-$router::add('/post/add',['Controller' => 'Posts', 'Action' => 'add']);
 
 
-if (Router::matchRoute($query)){
-    debug(Router::getRoute());
-}else{
-    echo '404';
-}
+Router::add("/(?P<Controller>[a-z-]+)\/(?P<Action>[a-z-]+)/i");
+Router::add("/(?P<Controller>[a-z-]+)/i");
+Router::add("/\S/",['Controller' => 'Main', 'Action' => 'index']);
+
+
+debug(Router::getRoutes());
+debug(Router::dispatch($query));
+
+
+//if (Router::matchRoute($query)){
+//    debug(Router::getRoute());
+//}else{
+//    echo '404';
+//}
