@@ -32,8 +32,7 @@ class Router
 		        if (!isset($route['Action'])){
 		            $route['Action'] = 'index';
                 }
-                array_merge(self::$route,$route);
-		        debug($route);
+                self::$route = $route;
 			    return true;
 			}
 		}
@@ -43,13 +42,34 @@ class Router
 	public static function dispatch($url)
     {
         if(self::matchRoute($url)){
-            debug(self::$route);
+            $controller = Router::routeFilterController(self::$route['Controller']);
+            $action = Router::routeFilterAction(self::$route['Action']);
+            debug($action);
+            if (class_exists($controller)){
+                $$controller = new $controller;
+                if (method_exists($$controller, $action)){
+                    $$controller->$action();
+                }else{
+                    echo "Method {$action} doesn't exist in {$controller}";
+                }
+            }else{
+                echo "Class {$controller} doesn't exist";
+            }
         }else{
             http_response_code(404);
             include '404.html';
         }
     }
 
+    public static function routeFilterController($name)
+    {
+        return str_replace(' ','',ucwords(str_replace('-', '', $name)));
+    }
+
+    public static function routeFilterAction($name)
+    {
+        return lcfirst(self::routeFilterController($name));
+    }
 }
 
 //
