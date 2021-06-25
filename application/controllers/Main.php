@@ -12,4 +12,9 @@ class Main
     {
         echo "Main constructor";
     }
+
+    public function index() {
+        debug('adfa');
+        return "asdasdasd";
+    }
 }

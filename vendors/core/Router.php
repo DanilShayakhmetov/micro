@@ -23,14 +23,14 @@ class Router
 	public static function matchRoute($url)
 	{
 	    foreach (self::$routes as $pattern => $route){
-	   if(preg_match($pattern, $url, $matches)){
+	        if(preg_match("#$pattern#i", $url, $matches)){
 		        foreach ($matches as $k => $v){
                     if (is_string($k)){
                         $route[$k] = $v;
                     }
                 }
-		        if (!isset($route['Action'])){
-		            $route['Action'] = 'index';
+		        if (!isset($route['action'])){
+		            $route['action'] = 'index';
                 }
                 self::$route = $route;
 			    return true;
@@ -42,8 +42,8 @@ class Router
 	public static function dispatch($url)
     {
         if(self::matchRoute($url)){
-            $controller = Router::routeFilterController(self::$route['Controller']);
-            $action = Router::routeFilterAction(self::$route['Action']);
+            $controller = Router::routeFilterController(self::$route['controller']);
+            $action = Router::routeFilterAction(self::$route['action']);
             debug($action);
             if (class_exists($controller)){
                 $$controller = new $controller;
@@ -57,7 +57,7 @@ class Router
             }
         }else{
             http_response_code(404);
-            include '404.html';
+            include '../../public/404.html';
         }
     }
 
