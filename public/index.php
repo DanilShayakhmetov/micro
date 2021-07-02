@@ -1,18 +1,25 @@
 <?php
 
+use vendor\core\Router;
+
+require '../vendor/lib/functions.php';
 
 
-require '../vendors/core/Router.php';
-require '../vendors/lib/functions.php';
-require '../application/controllers/Main.php';
-require '../application/controllers/Posts.php';
+define('WWW', __DIR__);
+define('CORE', dirname(__DIR__).'/vendor/core');
+define('ROOT', dirname(__DIR__));
+define('APP', dirname(__DIR__).'/app');
+define('LAYOUT', dirname(__DIR__).'/app/views/Layouts/default.php');
+define('LAYOUT1', dirname(__DIR__).'/app/views/Layouts/default1.php');
+
+
+
 
 spl_autoload_register(function ($class) {
-    $dir = '../application/controllers/';
-    foreach (scandir($dir) as $class){
-        require '../application/controllers/' . $class . '.class g.php';
+    $path = '../'.str_replace('\\','/', $class).'.php';
+    if (is_file($path)) {
+        require_once $path;
     }
-
 });
 
 
@@ -26,7 +33,7 @@ Router::add("^$",['Controller' => 'Main', 'Action' => 'index']);
 
 
 
-debug(Router::getRoutes());
+//debug(Router::getRoutes());
 debug(Router::dispatch($query));
 
 

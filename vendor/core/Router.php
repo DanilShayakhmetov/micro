@@ -1,5 +1,10 @@
 <?php
 
+namespace vendor\core;
+
+use app\controllers\Main;
+use http\Url;
+
 class Router
 {
 	protected static $routes = array();
@@ -32,7 +37,8 @@ class Router
 		        if (!isset($route['action'])){
 		            $route['action'] = 'index';
                 }
-                self::$route = $route;
+                self::$route['controller'] = Router::routeFilterController($route['controller']);
+                self::$route['action'] = Router::routeFilterAction($route['action']);;
 			    return true;
 			}
 		}
@@ -41,12 +47,12 @@ class Router
 
 	public static function dispatch($url)
     {
+        $url = Router::urlFilter($url);
         if(self::matchRoute($url)){
-            $controller = Router::routeFilterController(self::$route['controller']);
-            $action = Router::routeFilterAction(self::$route['action']);
-            debug($action);
+            $controller = 'app\controllers\\'.self::$route['controller'];
+            $action = self::$route['action'].'Action';
             if (class_exists($controller)){
-                $$controller = new $controller;
+                $$controller = new $controller(self::$route);
                 if (method_exists($$controller, $action)){
                     $$controller->$action();
                 }else{
@@ -70,11 +76,13 @@ class Router
     {
         return lcfirst(self::routeFilterController($name));
     }
-}
 
-//
-//var_dump($pattern);
-//$url = $_SERVER['REQUEST_URI'];
-//var_dump($url);
-//preg_match("/^(?P<controller>[a-z-]+)\/(?P<action>[a-z-]+)$/i", $url, $matches);
-//var_dump($matches);
+    public static function urlFilter($url)
+    {
+        if ($url) {
+            $url = explode('?', $url);
+//            debug($url);
+        }
+        return rtrim( $url[0],'/');
+    }
+}
